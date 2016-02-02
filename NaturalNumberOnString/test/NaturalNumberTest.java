@@ -10,7 +10,7 @@ import components.naturalnumber.NaturalNumber2;
  * JUnit test fixture for {@code NaturalNumber}'s constructors and kernel
  * methods.
  *
- * @authors Tyler Kunkel & Mitchel Kromer
+ * @author Tyler Kunkel & Mitchel Kromer
  *
  */
 public abstract class NaturalNumberTest {
