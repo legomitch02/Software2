@@ -2,6 +2,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import components.array.Array;
+import components.array.Array1L;
 import components.map.Map;
 import components.map.MapSecondary;
 
@@ -13,7 +14,9 @@ import components.map.MapSecondary;
  *            type of {@code Map} domain (key) entries
  * @param <V>
  *            type of {@code Map} range (associated value) entries
- * @convention <pre>
+ * @convention
+ *
+ *             <pre>
  * |$this.hashTable.entries| > 0  and
  * for all i: integer, pf: PARTIAL_FUNCTION, x: K
  *     where (0 <= i  and  i < |$this.hashTable.entries|  and
@@ -25,13 +28,16 @@ import components.map.MapSecondary;
  *     where (0 <= i  and  i < |$this.hashTable.entries|  and
  *            <pf> = $this.hashTable.entries[i, i+1))
  *   (|pf|)
- * </pre>
- * @correspondence <pre>
+ *             </pre>
+ *
+ * @correspondence
+ *
+ *                 <pre>
  * this = union i: integer, pf: PARTIAL_FUNCTION
  *            where (0 <= i  and  i < |$this.hashTable.entries|  and
  *                   <pf> = $this.hashTable.entries[i, i+1))
  *          (pf)
- * </pre>
+ *                 </pre>
  */
 public class Map4<K, V> extends MapSecondary<K, V> {
 
@@ -63,18 +69,25 @@ public class Map4<K, V> extends MapSecondary<K, V> {
      *            the modulus
      * @return the result of a mod b, which satisfies 0 <= {@code mod} < b
      * @requires b > 0
-     * @ensures <pre>
+     * @ensures
+     *
+     *          <pre>
      * 0 <= mod  and  mod < b  and
      * there exists k: integer (a = k * b + mod)
-     * </pre>
+     *          </pre>
      */
     private static int mod(int a, int b) {
+        //this was easy enough
         assert b > 0 : "Violation of: b > 0";
-
-        // TODO - fill in body
-
-        // This line added just to make the component compilable.
-        return 0;
+        int btemp = b;
+        while (btemp > a || btemp <= 0) {
+            if (btemp > a) {
+                btemp -= a;
+            } else {
+                btemp += a;
+            }
+        }
+        return btemp;
     }
 
     /**
@@ -83,19 +96,21 @@ public class Map4<K, V> extends MapSecondary<K, V> {
      * @param hashTableSize
      *            the size of the hash table
      * @requires hashTableSize > 0
-     * @ensures <pre>
+     * @ensures
+     *
+     *          <pre>
      * |$this.hashTable.entries| = hashTableSize  and
      * for all i: integer
      *     where (0 <= i  and  i < |$this.hashTable.entries|)
      *   ($this.hashTable.entries[i, i+1) = <{}>  and
      *    i is in $this.hashTable.examinableIndices)  and
      * $this.size = 0
-     * </pre>
+     *          </pre>
      */
     private void createNewRep(int hashTableSize) {
-
-        // TODO - fill in body
-
+        //guessing here, too
+        this.hashTable = new Array1L<Map<K, V>>(hashTableSize);
+        this.size = hashTableSize;
     }
 
     /*
@@ -106,8 +121,8 @@ public class Map4<K, V> extends MapSecondary<K, V> {
      * No-argument constructor.
      */
     public Map4() {
-
-        // TODO - fill in body
+        //no idea - straight guessing
+        this.createNewRep(this.size);
 
     }
 
@@ -120,8 +135,12 @@ public class Map4<K, V> extends MapSecondary<K, V> {
      * @ensures this = {}
      */
     public Map4(int hashTableSize) {
-
-        // TODO - fill in body
+        /*
+         * a bit confused about this part - is this where we use the hash codes
+         * to add in the maps?
+         */
+        this.size = hashTableSize;
+        this.hashTable = new Array1L<Map<K, V>>(hashTableSize);
 
     }
 
@@ -135,8 +154,8 @@ public class Map4<K, V> extends MapSecondary<K, V> {
         try {
             return this.getClass().newInstance();
         } catch (ReflectiveOperationException e) {
-            throw new AssertionError("Cannot construct object of type "
-                    + this.getClass());
+            throw new AssertionError(
+                    "Cannot construct object of type " + this.getClass());
         }
     }
 
@@ -166,65 +185,59 @@ public class Map4<K, V> extends MapSecondary<K, V> {
      * Kernel methods ---------------------------------------------------------
      */
 
+    /*
+     * most of these use hashCode - should we be using the mod method made above
+     * or is this fine?
+     */
+
     @Override
     public final void add(K key, V value) {
         assert key != null : "Violation of: key is not null";
         assert value != null : "Violation of: value is not null";
         assert !this.hasKey(key) : "Violation of: key is not in DOMAIN(this)";
-
-        // TODO - fill in body
-
+        //this will alias the Map called, right?
+        //no need to remove, add pair, and add back in. right?
+        this.hashTable.entry(key.hashCode()).add(key, value);
     }
 
     @Override
     public final Pair<K, V> remove(K key) {
         assert key != null : "Violation of: key is not null";
         assert this.hasKey(key) : "Violation of: key is in DOMAIN(this)";
-
-        // TODO - fill in body
-
-        // This line added just to make the component compilable.
-        return null;
+        Pair<K, V> pair = this.hashTable.entry(key.hashCode()).remove(key);
+        return pair;
     }
 
     @Override
     public final Pair<K, V> removeAny() {
         assert this.size() > 0 : "Violation of: this /= empty_set";
-
-        // TODO - fill in body
-
-        // This line added just to make the component compilable.
-        return null;
+        //do a random index for the array?
+        Pair<K, V> pair = this.hashTable.entry(0).removeAny();
+        return pair;
     }
 
     @Override
     public final V value(K key) {
         assert key != null : "Violation of: key is not null";
         assert this.hasKey(key) : "Violation of: key is in DOMAIN(this)";
-
-        // TODO - fill in body
-
-        // This line added just to make the component compilable.
-        return null;
+        return this.hashTable.entry(key.hashCode()).value(key);
     }
 
     @Override
     public final boolean hasKey(K key) {
         assert key != null : "Violation of: key is not null";
-
-        // TODO - fill in body
-
-        // This line added just to make the component compilable.
-        return false;
+        //should be kosher - using kernel hasKey
+        return this.hashTable.entry(key.hashCode()).hasKey(key);
     }
 
     @Override
     public final int size() {
-
-        // TODO - fill in body
-
-        // This line added just to make the component compilable.
-        return 0;
+        int size = 0;
+        for (int i = 0; i < this.hashTable.length(); i++) {
+            //size is a kernel method for Map. Is this safe?
+            size += this.hashTable.entry(i).size();
+        }
+        return size;
     }
 
     @Override
@@ -283,8 +296,8 @@ public class Map4<K, V> extends MapSecondary<K, V> {
             }
             while (!this.bucketIterator.hasNext()) {
                 this.currentBucket++;
-                this.bucketIterator = Map4.this.hashTable.entry(
-                        this.currentBucket).iterator();
+                this.bucketIterator = Map4.this.hashTable
+                        .entry(this.currentBucket).iterator();
             }
             return this.bucketIterator.next();
         }
