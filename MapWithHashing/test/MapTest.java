@@ -77,6 +77,72 @@ public abstract class MapTest {
         return map;
     }
 
-    // TODO - add test cases for constructor, add, remove, removeAny, value, hasKey, and size
+    public void testAddToEmptyMap() {
+        Map<String, String> check = this.createFromArgsTest();
+        Map<String, String> compare = this.createFromArgsRef("Hi", "Cow");
+        check.add("Hi", "Cow");
+        assertEquals(compare, check);
+    }
+
+    @Test
+    public void testAddToNonEmptyMap() {
+        Map<String, String> check = this.createFromArgsTest("Hi", "Cow");
+        Map<String, String> compare = this.createFromArgsRef("Hi", "Cow",
+                "corn", "egg");
+        check.add("corn", "egg");
+        assertEquals(compare, check);
+    }
+
+    @Test
+    public void testRemove() {
+        Map<String, String> check = this.createFromArgsTest("Hi", "Cow");
+        Map<String, String> compare = this.createFromArgsRef("Hi", "Cow");
+        Pair<String, String> hold = check.remove("Hi");
+        Pair<String, String> match = compare.remove("Hi");
+        assertEquals(compare, check);
+        assertEquals(match, hold);
+    }
+
+    @Test
+    public void testRemoveAny() {
+        Map<String, String> check = this.createFromArgsTest("Hi", "Cow", "corn",
+                "egg");
+        Map<String, String> compare = this.createFromArgsRef("Hi", "Cow",
+                "corn", "egg");
+        Pair<String, String> hold = check.removeAny();
+        assertTrue(compare.hasKey(hold.key()));
+        Pair<String, String> match = compare.remove(hold.key());
+        assertEquals(compare, check);
+        assertEquals(match, hold);
+    }
+
+    @Test
+    public void testValue() {
+        Map<String, String> check = this.createFromArgsTest("Hi", "Cow");
+        Map<String, String> compare = this.createFromArgsRef("Hi", "Cow");
+        assertEquals(compare.value("Hi"), check.value("Hi"));
+        assertEquals("Cow", check.value("Hi"));
+    }
+
+    @Test
+    public void testHasKey() {
+        Map<String, String> check = this.createFromArgsTest("Hi", "Cow", "corn",
+                "egg");
+        assertTrue(check.hasKey("Hi"));
+        assertTrue(check.hasKey("corn"));
+    }
+
+    @Test
+    public void testSizeEmpty() {
+        Map<String, String> check = this.createFromArgsTest();
+        assertEquals(0, check.size());
+    }
+
+    @Test
+    public void testSizeNotZero() {
+        Map<String, String> check = this.createFromArgsTest("Hi", "Cow", "corn",
+                "egg");
+        assertEquals(2, check.size());
+    }
 
 }
