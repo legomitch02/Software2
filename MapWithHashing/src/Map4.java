@@ -4,6 +4,7 @@ import java.util.NoSuchElementException;
 import components.array.Array;
 import components.array.Array1L;
 import components.map.Map;
+import components.map.Map1L;
 import components.map.MapSecondary;
 
 /**
@@ -79,15 +80,11 @@ public class Map4<K, V> extends MapSecondary<K, V> {
     private static int mod(int a, int b) {
         //this was easy enough
         assert b > 0 : "Violation of: b > 0";
-        int btemp = b;
-        while (btemp > a || btemp <= 0) {
-            if (btemp > a) {
-                btemp -= a;
-            } else {
-                btemp += a;
-            }
+        int mod = a % b;
+        if (mod < 0) {
+            mod = b + mod;
         }
-        return btemp;
+        return mod;
     }
 
     /**
@@ -108,9 +105,12 @@ public class Map4<K, V> extends MapSecondary<K, V> {
      *          </pre>
      */
     private void createNewRep(int hashTableSize) {
-        //guessing here, too
         this.hashTable = new Array1L<Map<K, V>>(hashTableSize);
-        this.size = hashTableSize;
+        int index = 0;
+        while (index < this.hashTable.length()) {
+            this.hashTable.setEntry(index, new Map1L<K, V>());
+        }
+        this.size = 0;
     }
 
     /*
@@ -121,9 +121,8 @@ public class Map4<K, V> extends MapSecondary<K, V> {
      * No-argument constructor.
      */
     public Map4() {
-        //no idea - straight guessing
-        this.createNewRep(this.size);
 
+        this.createNewRep(Map4.DEFAULT_HASH_TABLE_SIZE);
     }
 
     /**
@@ -135,13 +134,7 @@ public class Map4<K, V> extends MapSecondary<K, V> {
      * @ensures this = {}
      */
     public Map4(int hashTableSize) {
-        /*
-         * a bit confused about this part - is this where we use the hash codes
-         * to add in the maps?
-         */
-        this.size = hashTableSize;
-        this.hashTable = new Array1L<Map<K, V>>(hashTableSize);
-
+        this.createNewRep(hashTableSize);
     }
 
     /*
@@ -195,24 +188,30 @@ public class Map4<K, V> extends MapSecondary<K, V> {
         assert key != null : "Violation of: key is not null";
         assert value != null : "Violation of: value is not null";
         assert !this.hasKey(key) : "Violation of: key is not in DOMAIN(this)";
-        //this will alias the Map called, right?
-        //no need to remove, add pair, and add back in. right?
-        this.hashTable.entry(key.hashCode()).add(key, value);
+        int bucket = mod(key.hashCode(), this.hashTable.length());
+        this.hashTable.entry(bucket).add(key, value);
+        this.size++;
     }
 
     @Override
     public final Pair<K, V> remove(K key) {
         assert key != null : "Violation of: key is not null";
         assert this.hasKey(key) : "Violation of: key is in DOMAIN(this)";
-        Pair<K, V> pair = this.hashTable.entry(key.hashCode()).remove(key);
+        int bucket = mod(key.hashCode(), this.hashTable.length());
+        Pair<K, V> pair = this.hashTable.entry(bucket).remove(key);
+        this.size--;
         return pair;
     }
 
     @Override
     public final Pair<K, V> removeAny() {
         assert this.size() > 0 : "Violation of: this /= empty_set";
-        //do a random index for the array?
-        Pair<K, V> pair = this.hashTable.entry(0).removeAny();
+        int bucket = 0;
+        while (this.hashTable.entry(bucket).size() == 0) {
+            bucket++;
+        }
+        Pair<K, V> pair = this.hashTable.entry(bucket).removeAny();
+        this.size--;
         return pair;
     }
 
@@ -220,24 +219,21 @@ public class Map4<K, V> extends MapSecondary<K, V> {
     public final V value(K key) {
         assert key != null : "Violation of: key is not null";
         assert this.hasKey(key) : "Violation of: key is in DOMAIN(this)";
-        return this.hashTable.entry(key.hashCode()).value(key);
+        int bucket = mod(key.hashCode(), this.hashTable.length());
+        return this.hashTable.entry(bucket).value(key);
     }
 
     @Override
     public final boolean hasKey(K key) {
         assert key != null : "Violation of: key is not null";
-        //should be kosher - using kernel hasKey
-        return this.hashTable.entry(key.hashCode()).hasKey(key);
+        int bucket = mod(key.hashCode(), this.hashTable.length());
+        return this.hashTable.entry(bucket).hasKey(key);
     }
 
     @Override
     public final int size() {
-        int size = 0;
-        for (int i = 0; i < this.hashTable.length(); i++) {
-            //size is a kernel method for Map. Is this safe?
-            size += this.hashTable.entry(i).size();
-        }
-        return size;
+
+        return this.size;
     }
 
     @Override
