@@ -10,14 +10,17 @@ import components.set.SetSecondary;
  *
  * @param <T>
  *            type of {@code Set} elements
- * @mathdefinitions <pre>
+ * @mathdefinitions
+ *
+ *                  <pre>
  * IS_BST(
  *   tree: binary tree of T
  *  ): boolean satisfies
  *  [tree satisfies the binary search tree properties as described in the
  *   slides with the ordering reported by compareTo for T, including that
  *   it has no duplicate labels]
- * </pre>
+ *                  </pre>
+ *
  * @convention IS_BST($this.tree)
  * @correspondence this = labels($this.tree)
  */
@@ -49,11 +52,20 @@ public class Set3<T extends Comparable<T>> extends SetSecondary<T> {
             T x) {
         assert t != null : "Violation of: t is not null";
         assert x != null : "Violation of: x is not null";
-
-        // TODO - fill in body
-
-        // This line added just to make the component compilable.
-        return false;
+        boolean answer = false;
+        int compare = t.root().compareTo(x);
+        BinaryTree<T> left = t.newInstance();
+        BinaryTree<T> right = t.newInstance();
+        T root = t.disassemble(left, right);
+        if (compare == 0) {
+            answer = true;
+        } else if (compare < 0) {
+            answer = isInTree(right, x);
+        } else {
+            answer = isInTree(left, x);
+        }
+        t.assemble(root, left, right);
+        return answer;
     }
 
     /**
@@ -75,8 +87,20 @@ public class Set3<T extends Comparable<T>> extends SetSecondary<T> {
         assert t != null : "Violation of: t is not null";
         assert x != null : "Violation of: x is not null";
 
-        // TODO - fill in body
-
+        int compare = t.root().compareTo(x);
+        BinaryTree<T> left = t.newInstance();
+        BinaryTree<T> right = t.newInstance();
+        if (t.size() > 0) {
+            T root = t.disassemble(left, right);
+            if (compare < 0) {
+                insertInTree(right, x);
+            } else {
+                insertInTree(left, x);
+            }
+            t.assemble(root, left, right);
+        } else {
+            t.assemble(x, left, right);
+        }
     }
 
     /**
@@ -89,18 +113,27 @@ public class Set3<T extends Comparable<T>> extends SetSecondary<T> {
      * @return the smallest label in the given {@code BinaryTree}
      * @updates t
      * @requires IS_BST(t) and |t| > 0
-     * @ensures <pre>
+     * @ensures
+     *
+     *          <pre>
      * IS_BST(t)  and  removeSmallest = [the smallest label in #t]  and
      *  labels(t) = labels(#t) \ {removeSmallest}
-     * </pre>
+     *          </pre>
      */
     private static <T> T removeSmallest(BinaryTree<T> t) {
         assert t != null : "Violation of: t is not null";
-
-        // TODO - fill in body
-
-        // This line added just to make the component compilable.
-        return null;
+        T smallest;
+        BinaryTree<T> left = t.newInstance();
+        BinaryTree<T> right = t.newInstance();
+        T root = t.disassemble(left, right);
+        if (left.size() > 0) {
+            smallest = removeSmallest(left);
+            t.assemble(root, left, right);
+        } else {
+            smallest = root;
+            t.transferFrom(right);
+        }
+        return smallest;
     }
 
     /**
@@ -116,10 +149,12 @@ public class Set3<T extends Comparable<T>> extends SetSecondary<T> {
      * @return the removed label
      * @updates t
      * @requires IS_BST(t) and x is in labels(t)
-     * @ensures <pre>
+     * @ensures
+     *
+     *          <pre>
      * IS_BST(t)  and  removeFromTree = x  and
      *  labels(t) = labels(#t) \ {x}
-     * </pre>
+     *          </pre>
      */
     private static <T extends Comparable<T>> T removeFromTree(BinaryTree<T> t,
             T x) {
@@ -164,8 +199,8 @@ public class Set3<T extends Comparable<T>> extends SetSecondary<T> {
         try {
             return this.getClass().newInstance();
         } catch (ReflectiveOperationException e) {
-            throw new AssertionError("Cannot construct object of type "
-                    + this.getClass());
+            throw new AssertionError(
+                    "Cannot construct object of type " + this.getClass());
         }
     }
 
