@@ -78,7 +78,6 @@ public class Map4<K, V> extends MapSecondary<K, V> {
      *          </pre>
      */
     private static int mod(int a, int b) {
-        //this was easy enough
         assert b > 0 : "Violation of: b > 0";
         int mod = a % b;
         if (mod < 0) {
@@ -109,6 +108,7 @@ public class Map4<K, V> extends MapSecondary<K, V> {
         int index = 0;
         while (index < this.hashTable.length()) {
             this.hashTable.setEntry(index, new Map1L<K, V>());
+            index++;
         }
         this.size = 0;
     }
@@ -176,11 +176,6 @@ public class Map4<K, V> extends MapSecondary<K, V> {
 
     /*
      * Kernel methods ---------------------------------------------------------
-     */
-
-    /*
-     * most of these use hashCode - should we be using the mod method made above
-     * or is this fine?
      */
 
     @Override
