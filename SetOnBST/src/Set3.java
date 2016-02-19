@@ -160,11 +160,13 @@ public class Set3<T extends Comparable<T>> extends SetSecondary<T> {
             T x) {
         assert t != null : "Violation of: t is not null";
         assert x != null : "Violation of: x is not null";
+        T removed = null;
         int compare = t.root().compareTo(x);
         BinaryTree<T> left = t.newInstance();
         BinaryTree<T> right = t.newInstance();
         T root = t.disassemble(left, right);
         if (compare == 0) {
+            removed = root;
             if (right.size() > 1) {
                 T newRoot = removeSmallest(right);
                 t.assemble(newRoot, left, right);
@@ -172,14 +174,13 @@ public class Set3<T extends Comparable<T>> extends SetSecondary<T> {
                 t.transferFrom(left);
             }
         } else if (compare < 0) {
-            removeFromTree(right, x);
+            removed = removeFromTree(right, x);
             t.assemble(root, left, right);
         } else {
-            removeFromTree(left, x);
+            removed = removeFromTree(left, x);
             t.assemble(root, left, right);
         }
-
-        return null;
+        return removed;
     }
 
     /**
