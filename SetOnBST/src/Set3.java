@@ -160,10 +160,25 @@ public class Set3<T extends Comparable<T>> extends SetSecondary<T> {
             T x) {
         assert t != null : "Violation of: t is not null";
         assert x != null : "Violation of: x is not null";
+        int compare = t.root().compareTo(x);
+        BinaryTree<T> left = t.newInstance();
+        BinaryTree<T> right = t.newInstance();
+        T root = t.disassemble(left, right);
+        if (compare == 0) {
+            if (right.size() > 1) {
+                T newRoot = removeSmallest(right);
+                t.assemble(newRoot, left, right);
+            } else {
+                t.transferFrom(left);
+            }
+        } else if (compare < 0) {
+            removeFromTree(right, x);
+            t.assemble(root, left, right);
+        } else {
+            removeFromTree(left, x);
+            t.assemble(root, left, right);
+        }
 
-        // TODO - fill in body
-
-        // This line added just to make the component compilable.
         return null;
     }
 
