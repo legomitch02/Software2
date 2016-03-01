@@ -54,18 +54,20 @@ public class Set3<T extends Comparable<T>> extends SetSecondary<T> {
         assert t != null : "Violation of: t is not null";
         assert x != null : "Violation of: x is not null";
         boolean answer = false;
-        int compare = t.root().compareTo(x);
-        BinaryTree<T> left = t.newInstance();
-        BinaryTree<T> right = t.newInstance();
-        T root = t.disassemble(left, right);
-        if (compare == 0) {
-            answer = true;
-        } else if (compare < 0) {
-            answer = isInTree(right, x);
-        } else {
-            answer = isInTree(left, x);
+        if (t.size() > 0) {
+            int compare = t.root().compareTo(x);
+            BinaryTree<T> left = t.newInstance();
+            BinaryTree<T> right = t.newInstance();
+            T root = t.disassemble(left, right);
+            if (compare == 0) {
+                answer = true;
+            } else if (compare < 0) {
+                answer = isInTree(right, x);
+            } else {
+                answer = isInTree(left, x);
+            }
+            t.assemble(root, left, right);
         }
-        t.assemble(root, left, right);
         return answer;
     }
 
@@ -87,11 +89,10 @@ public class Set3<T extends Comparable<T>> extends SetSecondary<T> {
             T x) {
         assert t != null : "Violation of: t is not null";
         assert x != null : "Violation of: x is not null";
-
-        int compare = t.root().compareTo(x);
         BinaryTree<T> left = t.newInstance();
         BinaryTree<T> right = t.newInstance();
         if (t.size() > 0) {
+            int compare = t.root().compareTo(x);
             T root = t.disassemble(left, right);
             if (compare < 0) {
                 insertInTree(right, x);
@@ -161,7 +162,7 @@ public class Set3<T extends Comparable<T>> extends SetSecondary<T> {
             T x) {
         assert t != null : "Violation of: t is not null";
         assert x != null : "Violation of: x is not null";
-        T removed = null;
+        T removed;
         int compare = t.root().compareTo(x);
         BinaryTree<T> left = t.newInstance();
         BinaryTree<T> right = t.newInstance();
@@ -250,9 +251,7 @@ public class Set3<T extends Comparable<T>> extends SetSecondary<T> {
     public final void add(T x) {
         assert x != null : "Violation of: x is not null";
         assert !this.contains(x) : "Violation of: x is not in this";
-
         insertInTree(this.tree, x);
-
     }
 
     @Override
