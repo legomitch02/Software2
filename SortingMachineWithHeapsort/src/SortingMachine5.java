@@ -4,7 +4,9 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import components.array.Array;
+import components.array.Array1L;
 import components.queue.Queue;
+import components.queue.Queue1L;
 import components.sortingmachine.SortingMachine;
 import components.sortingmachine.SortingMachineSecondary;
 
@@ -14,7 +16,9 @@ import components.sortingmachine.SortingMachineSecondary;
  *
  * @param <T>
  *            type of {@code SortingMachine} entries
- * @mathdefinitions <pre>
+ * @mathdefinitions
+ *
+ *                  <pre>
  * IS_TOTAL_PREORDER (
  *   r: binary relation on T
  *  ) : boolean is
@@ -40,8 +44,11 @@ import components.sortingmachine.SortingMachineSecondary;
  *  [the multiset of entries in a that belong to the subtree of a
  *   (when a is interpreted as a complete binary tree) rooted at
  *   index start and only through entry stop]
- * </pre>
- * @convention <pre>
+ *                  </pre>
+ *
+ * @convention
+ *
+ *             <pre>
  * IS_TOTAL_PREORDER([relation computed by $this.machineOrder.compare method]  and
  * if $this.insertionMode then
  *   $this.heapSize = 0
@@ -51,14 +58,17 @@ import components.sortingmachine.SortingMachineSecondary;
  *   SUBTREE_IS_HEAP($this.heap, 0, $this.heapSize - 1,
  *     [relation computed by $this.machineOrder.compare method])  and
  *   0 <= $this.heapSize <= |$this.heap.entries|
- * </pre>
- * @correspondence <pre>
+ *             </pre>
+ *
+ * @correspondence
+ *
+ *                 <pre>
  * if $this.insertionMode then
  *   this = (true, $this.machineOrder, multiset_entries($this.entries))
  * else
  *   this = (false, $this.machineOrder,
  *     multiset_entries($this.heap.entries[0, $this.heapSize)))
- * </pre>
+ *                 </pre>
  */
 public class SortingMachine5<T> extends SortingMachineSecondary<T> {
 
@@ -107,7 +117,9 @@ public class SortingMachine5<T> extends SortingMachineSecondary<T> {
      * @param order
      *            total preorder for sorting
      * @updates array.entries
-     * @requires <pre>
+     * @requires
+     *
+     *           <pre>
      * 0 <= top  and  last < |array.entries|  and
      * |array.examinableIndices| = |array.entries|  and
      * [subtree rooted at {@code top} is a complete binary tree]  and
@@ -116,15 +128,18 @@ public class SortingMachine5<T> extends SortingMachineSecondary<T> {
      * SUBTREE_IS_HEAP(array, 2 * top + 2, last,
      *     [relation computed by order.compare method])  and
      * IS_TOTAL_PREORDER([relation computed by order.compare method])
-     * </pre>
-     * @ensures <pre>
+     *           </pre>
+     *
+     * @ensures
+     *
+     *          <pre>
      * SUBTREE_IS_HEAP(array, top, last,
      *     [relation computed by order.compare method])  and
      * perms(array.entries, #array.entries)  and
      * SUBTREE_ARRAY_ENTRIES(array, top, last) =
      *  SUBTREE_ARRAY_ENTRIES(#array, top, last)  and
      * [the other entries in array.entries are the same as in #array.entries]
-     * </pre>
+     *          </pre>
      */
     private static <T> void siftDown(Array<T> array, int top, int last,
             Comparator<T> order) {
@@ -147,10 +162,34 @@ public class SortingMachine5<T> extends SortingMachineSecondary<T> {
          * requires clause, because it must be true when using the Array
          * representation for a complete binary tree.
          */
-
-        // TODO - fill in body
-        // *** you must use the recursive algorithm discussed in class ***
-
+        int left = top * 2 + 1;
+        int right = left + 1;
+        if (array.mayBeExamined(left)) {
+            if (array.mayBeExamined(right)) {
+                boolean rootBigger = false;
+                int leftVSRight = order.compare(array.entry(left),
+                        array.entry(right));
+                if (leftVSRight < 0) {
+                    rootBigger = order.compare(array.entry(left),
+                            array.entry(top)) < 0;
+                } else if (leftVSRight > 0) {
+                    rootBigger = order.compare(array.entry(right),
+                            array.entry(top)) < 0;
+                }
+                if (rootBigger) {
+                    if (leftVSRight < 0) {
+                        array.exchangeEntries(top, left);
+                        siftDown(array, left, last, order);
+                    } else if (leftVSRight > 0) {
+                        array.exchangeEntries(top, right);
+                        siftDown(array, right, last, order);
+                    }
+                }
+            } else if (array.mayBeExamined(left) && (order
+                    .compare(array.entry(left), array.entry(top))) > 0) {
+                array.exchangeEntries(top, left);
+            }
+        }
     }
 
     /**
@@ -166,19 +205,25 @@ public class SortingMachine5<T> extends SortingMachineSecondary<T> {
      * @param order
      *            the total preorder for sorting
      * @updates array.entries
-     * @requires <pre>
+     * @requires
+     *
+     *           <pre>
      * 0 <= top  and
      * |array.examinableIndices| = |array.entries|  and
      * [subtree rooted at {@code top} is a complete binary tree]  and
      * IS_TOTAL_PREORDER([relation computed by order.compare method])
-     * </pre>
-     * @ensures <pre>
+     *           </pre>
+     *
+     * @ensures
+     *
+     *          <pre>
      * SUBTREE_IS_HEAP(array, top, |array.entries| - 1,
      *     [relation computed by order.compare method])  and
      * perms(array.entries, #array.entries)
-     * </pre>
+     *          </pre>
      */
-    private static <T> void heapify(Array<T> array, int top, Comparator<T> order) {
+    private static <T> void heapify(Array<T> array, int top,
+            Comparator<T> order) {
         assert array != null : "Violation of: array is not null";
         assert order != null : "Violation of: order is not null";
         assert 0 <= top : "Violation of: 0 <= top";
@@ -192,8 +237,15 @@ public class SortingMachine5<T> extends SortingMachineSecondary<T> {
          * representation for a complete binary tree.
          */
 
-        // TODO - fill in body
-        // *** you must use the recursive algorithm discussed in class ***
+        int left = top * 2 + 1;
+        int right = left + 1;
+        if (left < array.length()) {
+            heapify(array, left, order);
+        }
+        if (right < array.length()) {
+            heapify(array, right, order);
+        }
+        siftDown(array, top, array.length(), order);
 
     }
 
@@ -210,11 +262,13 @@ public class SortingMachine5<T> extends SortingMachineSecondary<T> {
      * @return the {@code Array} representation of a heap
      * @clears q
      * @requires IS_TOTAL_PREORDER([relation computed by order.compare method])
-     * @ensures <pre>
+     * @ensures
+     *
+     *          <pre>
      * SUBTREE_IS_HEAP(buildHeap, 0, |buildHeap.entries| - 1)  and
      * perms(buildHeap.entries, #q)  and
      * |buildHeap.examinableIndices| = |buildHeap.entries|
-     * </pre>
+     *          </pre>
      */
     private static <T> Array<T> buildHeap(Queue<T> q, Comparator<T> order) {
         assert q != null : "Violation of: q is not null";
@@ -223,10 +277,14 @@ public class SortingMachine5<T> extends SortingMachineSecondary<T> {
          * Impractical to check the requires clause.
          */
 
-        // TODO - fill in body
-
-        // This line added just to make the component compilable.
-        return null;
+        Array<T> heap = new Array1L<>(q.length());
+        int follow = 0;
+        while (follow < heap.length()) {
+            heap.setEntry(follow, q.dequeue());
+            follow++;
+        }
+        heapify(heap, 0, order);
+        return heap;
     }
 
     /**
@@ -245,15 +303,20 @@ public class SortingMachine5<T> extends SortingMachineSecondary<T> {
      *            total preorder for sorting
      * @return true if the subtree of the given {@code Array} rooted at the
      *         given {@code top} is a heap; false otherwise
-     * @requires <pre>
+     * @requires
+     *
+     *           <pre>
      * 0 <= top  and  last < |array.entries|  and
      * |array.examinableIndices| = |array.entries|  and
      * [subtree rooted at {@code top} is a complete binary tree]
-     * </pre>
-     * @ensures <pre>
+     *           </pre>
+     *
+     * @ensures
+     *
+     *          <pre>
      * isHeap = SUBTREE_IS_HEAP(heap, top, last,
      *     [relation computed by order.compare method])
-     * </pre>
+     *          </pre>
      */
     private static <T> boolean isHeap(Array<T> array, int top, int last,
             Comparator<T> order) {
@@ -275,7 +338,8 @@ public class SortingMachine5<T> extends SortingMachineSecondary<T> {
                     && isHeap(array, left, last, order);
             int right = left + 1;
             if (isHeap && (right <= last)) {
-                isHeap = (order.compare(array.entry(top), array.entry(right)) <= 0)
+                isHeap = (order.compare(array.entry(top),
+                        array.entry(right)) <= 0)
                         && isHeap(array, right, last, order);
             }
         }
@@ -288,7 +352,9 @@ public class SortingMachine5<T> extends SortingMachineSecondary<T> {
      *
      * @return true if the convention holds (or if assertion checking is off);
      *         otherwise reports a violated assertion
-     * @convention <pre>
+     * @convention
+     *
+     *             <pre>
      * if $this.insertionMode then
      *   $this.heapSize = 0
      * else
@@ -297,7 +363,7 @@ public class SortingMachine5<T> extends SortingMachineSecondary<T> {
      *   SUBTREE_IS_HEAP($this.heap, 0, $this.heapSize - 1,
      *     [relation computed by $this.machineOrder.compare method])  and
      *   0 <= $this.heapSize <= |$this.heap.entries|
-     * </pre>
+     *             </pre>
      */
     private boolean conventionHolds() {
         if (this.insertionMode) {
@@ -316,10 +382,11 @@ public class SortingMachine5<T> extends SortingMachineSecondary<T> {
                         + "Violation of: if not $this.insertionMode then"
                         + " |$this.heap.examinableIndices| = |$this.heap.entries|";
             }
-            assert isHeap(this.heap, 0, this.heapSize - 1, this.machineOrder) : ""
-                    + "Violation of: if not $this.insertionMode then"
-                    + " SUBTREE_IS_HEAP($this.heap, 0, $this.heapSize - 1,"
-                    + " [relation computed by $this.machineOrder.compare method])";
+            assert isHeap(this.heap, 0, this.heapSize - 1,
+                    this.machineOrder) : ""
+                            + "Violation of: if not $this.insertionMode then"
+                            + " SUBTREE_IS_HEAP($this.heap, 0, $this.heapSize - 1,"
+                            + " [relation computed by $this.machineOrder.compare method])";
         }
         return true;
     }
@@ -331,9 +398,10 @@ public class SortingMachine5<T> extends SortingMachineSecondary<T> {
      *            total preorder for sorting
      */
     private void createNewRep(Comparator<T> order) {
-
-        // TODO - fill in body
-
+        this.machineOrder = order;
+        this.entries = new Queue1L<T>();
+        this.insertionMode = true;
+        this.heapSize = 0;
     }
 
     /*
@@ -362,8 +430,8 @@ public class SortingMachine5<T> extends SortingMachineSecondary<T> {
             Constructor<?> c = this.getClass().getConstructor(Comparator.class);
             return (SortingMachine<T>) c.newInstance(this.machineOrder);
         } catch (ReflectiveOperationException e) {
-            throw new AssertionError("Cannot construct object of type "
-                    + this.getClass());
+            throw new AssertionError(
+                    "Cannot construct object of type " + this.getClass());
         }
     }
 
@@ -404,9 +472,8 @@ public class SortingMachine5<T> extends SortingMachineSecondary<T> {
     public final void add(T x) {
         assert x != null : "Violation of: x is not null";
         assert this.isInInsertionMode() : "Violation of: this.insertion_mode";
-
-        // TODO - fill in body
-
+        this.entries.enqueue(x);
+        this.heapSize++;
         assert this.conventionHolds();
     }
 
@@ -414,21 +481,25 @@ public class SortingMachine5<T> extends SortingMachineSecondary<T> {
     public final void changeToExtractionMode() {
         assert this.isInInsertionMode() : "Violation of: this.insertion_mode";
 
-        // TODO - fill in body
-
+        this.insertionMode = false;
+        this.heap = buildHeap(this.entries, this.machineOrder);
         assert this.conventionHolds();
     }
 
     @Override
     public final T removeFirst() {
-        assert !this.isInInsertionMode() : "Violation of: not this.insertion_mode";
+        assert !this
+                .isInInsertionMode() : "Violation of: not this.insertion_mode";
         assert this.size() > 0 : "Violation of: this.contents /= {}";
 
-        // TODO - fill in body
-
+        T hold = this.heap.replaceEntry(0, this.heap.entry(this.heapSize - 1));
+        this.heap.setEntry(this.heapSize - 1, null);
+        this.heapSize--;
+        if (this.heapSize > 0) {
+            siftDown(this.heap, 0, this.heapSize, this.machineOrder);
+        }
         assert this.conventionHolds();
-        // Fix this line to return the result after checking the convention.
-        return null;
+        return hold;
     }
 
     @Override
@@ -445,12 +516,9 @@ public class SortingMachine5<T> extends SortingMachineSecondary<T> {
 
     @Override
     public final int size() {
-
-        // TODO - fill in body
-
+        int length = this.heapSize;
         assert this.conventionHolds();
-        // Fix this line to return the result after checking the convention.
-        return 0;
+        return length;
     }
 
     @Override
@@ -488,7 +556,8 @@ public class SortingMachine5<T> extends SortingMachineSecondary<T> {
 
         @Override
         public boolean hasNext() {
-            if (!SortingMachine5.this.insertionMode && (this.notSeenCount == 0)) {
+            if (!SortingMachine5.this.insertionMode
+                    && (this.notSeenCount == 0)) {
                 assert SortingMachine5.this.conventionHolds();
                 return false;
             }
