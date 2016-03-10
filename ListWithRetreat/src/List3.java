@@ -14,7 +14,9 @@ import components.list.ListSecondary;
  *
  * @param <T>
  *            type of {@code List} entries
- * @convention <pre>
+ * @convention
+ *
+ *             <pre>
  * $this.leftLength >= 0  and
  * [$this.rightLength >= 0] and
  * [$this.preStart is not null]  and
@@ -29,14 +31,17 @@ import components.list.ListSecondary;
  *  pointed to by $this.preStart, n.previous.next = n]  and
  * [for every node n in the doubly linked list of nodes, except the one
  *  pointed to by $this.postFinish, n.next.previous = n]
- * </pre>
- * @correspondence <pre>
+ *             </pre>
+ *
+ * @correspondence
+ *
+ *                 <pre>
  * this =
  *  ([data in nodes starting at $this.preStart.next and running through
  *    $this.lastLeft],
  *   [data in nodes starting at $this.lastLeft.next and running through
  *    $this.postFinish.previous])
- * </pre>
+ *                 </pre>
  */
 public class List3<T> extends ListSecondary<T> {
 
@@ -93,7 +98,9 @@ public class List3<T> extends ListSecondary<T> {
      *
      * @return true if the convention holds (or if assertion checking is off);
      *         otherwise reports a violated assertion
-     * @convention <pre>
+     * @convention
+     *
+     *             <pre>
      * $this.leftLength >= 0  and
      * [$this.rightLength >= 0] and
      * [$this.preStart is not null]  and
@@ -108,7 +115,7 @@ public class List3<T> extends ListSecondary<T> {
      *  pointed to by $this.preStart, n.previous.next = n]  and
      * [for every node n in the doubly linked list of nodes, except the one
      *  pointed to by $this.postFinish, n.next.previous = n]
-     * </pre>
+     *             </pre>
      */
     private boolean conventionHolds() {
         assert this.leftLength >= 0 : "Violation of: $this.leftLength >= 0";
@@ -170,9 +177,13 @@ public class List3<T> extends ListSecondary<T> {
      * Creator of initial representation.
      */
     private void createNewRep() {
-
-        // TODO - fill in body
-
+        this.preStart = new Node();
+        this.postFinish = new Node();
+        this.preStart.next = this.postFinish;
+        this.postFinish.previous = this.preStart;
+        this.lastLeft = this.preStart;
+        this.leftLength = 0;
+        this.rightLength = 0;
     }
 
     /**
@@ -180,7 +191,7 @@ public class List3<T> extends ListSecondary<T> {
      */
     public List3() {
 
-        // TODO - fill in body
+        this.createNewRep();
 
         assert this.conventionHolds();
     }
@@ -191,8 +202,8 @@ public class List3<T> extends ListSecondary<T> {
         try {
             return this.getClass().newInstance();
         } catch (ReflectiveOperationException e) {
-            throw new AssertionError("Cannot construct object of type "
-                    + this.getClass());
+            throw new AssertionError(
+                    "Cannot construct object of type " + this.getClass());
         }
     }
 
@@ -226,57 +237,57 @@ public class List3<T> extends ListSecondary<T> {
     public final void addRightFront(T x) {
         assert x != null : "Violation of: x is not null";
 
-        // TODO - fill in body
-
+        Node add = new Node();
+        add.data = x;
+        add.next = this.lastLeft.next;
+        add.previous = this.lastLeft;
+        this.lastLeft.next = add;
+        add.next.previous = add;
+        this.rightLength++;
         assert this.conventionHolds();
+
     }
 
     @Override
     public final T removeRightFront() {
         assert this.rightLength() > 0 : "Violation of: this.right /= <>";
 
-        // TODO - fill in body
-
+        T hold = this.lastLeft.next.data;
+        this.lastLeft.next = this.lastLeft.next.next;
+        this.lastLeft.next.previous = this.lastLeft;
+        this.rightLength--;
         assert this.conventionHolds();
-        // Fix this line to return the result after checking the convention.
-        return null;
+        return hold;
     }
 
     @Override
     public final void advance() {
         assert this.rightLength() > 0 : "Violation of: this.right /= <>";
 
-        // TODO - fill in body
-
+        this.lastLeft = this.lastLeft.next;
+        this.leftLength++;
+        this.rightLength--;
         assert this.conventionHolds();
     }
 
     @Override
     public final void moveToStart() {
-
-        // TODO - fill in body
-
+        this.rightLength = this.rightLength + this.leftLength;
+        this.leftLength = 0;
+        this.lastLeft = this.preStart;
         assert this.conventionHolds();
     }
 
     @Override
     public final int leftLength() {
-
-        // TODO - fill in body
-
         assert this.conventionHolds();
-        // Fix this line to return the result after checking the convention.
-        return 0;
+        return this.leftLength;
     }
 
     @Override
     public final int rightLength() {
-
-        // TODO - fill in body
-
         assert this.conventionHolds();
-        // Fix this line to return the result after checking the convention.
-        return 0;
+        return this.rightLength;
     }
 
     @Override
@@ -339,18 +350,18 @@ public class List3<T> extends ListSecondary<T> {
 
     @Override
     public final void moveToFinish() {
-
-        // TODO - fill in body
-
+        this.leftLength = this.leftLength + this.rightLength;
+        this.rightLength = 0;
+        this.lastLeft = this.postFinish.previous;
         assert this.conventionHolds();
     }
 
     @Override
     public final void retreat() {
         assert this.leftLength() > 0 : "Violation of: this.left /= <>";
-
-        // TODO - fill in body
-
+        this.lastLeft = this.lastLeft.previous;
+        this.leftLength--;
+        this.rightLength++;
         assert this.conventionHolds();
     }
 
