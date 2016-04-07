@@ -1,0 +1,26 @@
+infect
+move
+skip
+turnleft
+turnright
+turnback
+IF next-is-friend THEN
+  infect
+END IF
+IF next-is-not-friend THEN
+  move
+ELSE
+  skip
+END IF
+WHILE next-is-wall DO
+  turnleft
+END WHILE
+IF next-is-not-wall THEN
+  turnright
+END IF
+IF random THEN
+  turnback
+END IF
+IF true THEN
+  infect
+END IF

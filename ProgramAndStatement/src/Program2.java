@@ -42,10 +42,12 @@ public class Program2 extends ProgramSecondary {
      * @param c
      *            the context to check
      * @return true if all instruction names are identifiers; false otherwise
-     * @ensures <pre>
+     * @ensures
+     *
+     *          <pre>
      * allIdentifiers =
      *   [all the names of instructions in c are valid IDENTIFIERs]
-     * </pre>
+     *          </pre>
      */
     private static boolean allIdentifiers(Map<String, Statement> c) {
         for (Map.Pair<String, Statement> pair : c) {
@@ -64,10 +66,12 @@ public class Program2 extends ProgramSecondary {
      *            the context to check
      * @return true if no instruction name is the name of a primitive
      *         instruction; false otherwise
-     * @ensures <pre>
+     * @ensures
+     *
+     *          <pre>
      * noPrimitiveInstructions =
      *   [no instruction name in c is the name of a primitive instruction]
-     * </pre>
+     *          </pre>
      */
     private static boolean noPrimitiveInstructions(Map<String, Statement> c) {
         return !c.hasKey("move") && !c.hasKey("turnleft")
@@ -83,10 +87,12 @@ public class Program2 extends ProgramSecondary {
      *            the context to check
      * @return true if all instruction bodies are BLOCK statements; false
      *         otherwise
-     * @ensures <pre>
+     * @ensures
+     *
+     *          <pre>
      * allBlocks =
      *   [all the bodies of instructions in c are BLOCK statements]
-     * </pre>
+     *          </pre>
      */
     private static boolean allBlocks(Map<String, Statement> c) {
         for (Map.Pair<String, Statement> pair : c) {
@@ -101,10 +107,9 @@ public class Program2 extends ProgramSecondary {
      * Creator of initial representation.
      */
     private void createNewRep() {
-
-        // TODO - fill in body
-        // Make sure to use Statement1 from the library
-        // Use Map1L for the context if you want the asserts below to match
+        this.name = "Unnamed";
+        this.context = new Map1L<>();
+        this.body = new Statement1();
 
     }
 
@@ -128,8 +133,8 @@ public class Program2 extends ProgramSecondary {
         try {
             return this.getClass().newInstance();
         } catch (ReflectiveOperationException e) {
-            throw new AssertionError("Cannot construct object of type "
-                    + this.getClass());
+            throw new AssertionError(
+                    "Cannot construct object of type " + this.getClass());
         }
     }
 
@@ -165,45 +170,40 @@ public class Program2 extends ProgramSecondary {
         assert Tokenizer.isIdentifier(n) : ""
                 + "Violation of: n is a valid IDENTIFIER";
 
-        // TODO - fill in body
-
-        // Fix this line to return the result.
-        return null;
+        String oldName = this.name;
+        this.name = n;
+        return oldName;
     }
 
     @Override
     public final Map<String, Statement> newContext() {
-
-        // TODO - fill in body
-
-        // Fix this line to return the result.
-        return null;
+        Map<String, Statement> move = this.context.newInstance();
+        return move;
     }
 
     @Override
-    public final Map<String, Statement> replaceContext(Map<String, Statement> c) {
+    public final Map<String, Statement> replaceContext(
+            Map<String, Statement> c) {
         assert c != null : "Violation of: c is not null";
         assert c instanceof Map1L<?, ?> : "Violation of: c is a Map1L<?, ?>";
-        assert allIdentifiers(c) : "Violation of: names in c are valid IDENTIFIERs";
+        assert allIdentifiers(
+                c) : "Violation of: names in c are valid IDENTIFIERs";
         assert noPrimitiveInstructions(c) : ""
                 + "Violation of: names in c do not match the names"
                 + " of primitive instructions in the BL language";
         assert allBlocks(c) : "Violation of: bodies in c"
                 + " are all BLOCK statements";
 
-        // TODO - fill in body
-
-        // Fix this line to return the result.
-        return null;
+        Map<String, Statement> flip = c.newInstance();
+        flip.transferFrom(this.context);
+        this.context.transferFrom(c);
+        return flip;
     }
 
     @Override
     public final Statement newBody() {
-
-        // TODO - fill in body
-
-        // Fix this line to return the result.
-        return null;
+        Statement toCompare = this.body.newInstance();
+        return toCompare;
     }
 
     @Override
@@ -212,10 +212,10 @@ public class Program2 extends ProgramSecondary {
         assert b instanceof Statement1 : "Violation of: b is a Statement1";
         assert b.kind() == Kind.BLOCK : "Violation of: b is a BLOCK statement";
 
-        // TODO - fill in body
-
-        // Fix this line to return the result.
-        return null;
+        Statement oldBody = b.newInstance();
+        oldBody.transferFrom(this.body);
+        this.body.transferFrom(b);
+        return oldBody;
     }
 
 }

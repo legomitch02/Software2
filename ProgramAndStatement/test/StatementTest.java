@@ -12,23 +12,21 @@ import components.utilities.Tokenizer;
 
 /**
  * JUnit test fixture for {@code Statement}'s constructor and kernel methods.
- * 
+ *
  * @author Wayne Heym
- * @author Put your name here
+ * @author Mitchel Kromer & Tyler Kunkle
  */
 public abstract class StatementTest {
 
     /**
      * The name of a file containing a sequence of BL statements.
      */
-    private static final String FILE_NAME_1 = "data/statement-sample.bl";
-
-    // TODO: define file names for additional test inputs
+    private static final String FILE_NAME_1 = "data/sample2.bl";
 
     /**
      * Invokes the {@code Statement} constructor for the implementation under
      * test and returns the result.
-     * 
+     *
      * @return the new statement
      * @ensures constructor = compose((BLOCK, ?, ?), <>)
      */
@@ -37,25 +35,27 @@ public abstract class StatementTest {
     /**
      * Invokes the {@code Statement} constructor for the reference
      * implementation and returns the result.
-     * 
+     *
      * @return the new statement
      * @ensures constructor = compose((BLOCK, ?, ?), <>)
      */
     protected abstract Statement constructorRef();
 
     /**
-     * 
+     *
      * Creates and returns a block {@code Statement}, of the type of the
      * implementation under test, from the file with the given name.
-     * 
+     *
      * @param filename
      *            the name of the file to be parsed for the sequence of
      *            statements to go in the block statement
      * @return the constructed block statement
-     * @ensures <pre>
+     * @ensures
+     *
+     *          <pre>
      * createFromFile = [the block statement containing the statements
      * parsed from the file]
-     * </pre>
+     *          </pre>
      */
     private Statement createFromFileTest(String filename) {
         Statement s = this.constructorTest();
@@ -67,18 +67,20 @@ public abstract class StatementTest {
     }
 
     /**
-     * 
+     *
      * Creates and returns a block {@code Statement}, of the reference
      * implementation type, from the file with the given name.
-     * 
+     *
      * @param filename
      *            the name of the file to be parsed for the sequence of
      *            statements to go in the block statement
      * @return the constructed block statement
-     * @ensures <pre>
+     * @ensures
+     *
+     *          <pre>
      * createFromFile = [the block statement containing the statements
      * parsed from the file]
-     * </pre>
+     *          </pre>
      */
     private Statement createFromFileRef(String filename) {
         Statement s = this.constructorRef();
@@ -213,35 +215,6 @@ public abstract class StatementTest {
     }
 
     /**
-     * Test assembleIf.
-     */
-    @Test
-    public final void testAssembleIf() {
-        /*
-         * Setup
-         */
-        Statement blockTest = this.createFromFileTest(FILE_NAME_1);
-        Statement blockRef = this.createFromFileRef(FILE_NAME_1);
-        Statement emptyBlock = blockRef.newInstance();
-        Statement sourceTest = blockTest.removeFromBlock(1);
-        Statement sRef = blockRef.removeFromBlock(1);
-        Statement nestedTest = sourceTest.newInstance();
-        Condition c = sourceTest.disassembleIf(nestedTest);
-        Statement sTest = sourceTest.newInstance();
-
-        /*
-         * The call
-         */
-        sTest.assembleIf(c, nestedTest);
-
-        /*
-         * Evaluation
-         */
-        assertEquals(emptyBlock, nestedTest);
-        assertEquals(sRef, sTest);
-    }
-
-    /**
      * Test disassembleIf.
      */
     @Test
@@ -249,10 +222,11 @@ public abstract class StatementTest {
         /*
          * Setup
          */
+        final int disIfPos = 7;
         Statement blockTest = this.createFromFileTest(FILE_NAME_1);
         Statement blockRef = this.createFromFileRef(FILE_NAME_1);
-        Statement sTest = blockTest.removeFromBlock(1);
-        Statement sRef = blockRef.removeFromBlock(1);
+        Statement sTest = blockTest.removeFromBlock(disIfPos);
+        Statement sRef = blockRef.removeFromBlock(disIfPos);
         Statement nestedTest = sTest.newInstance();
         Statement nestedRef = sRef.newInstance();
         Condition cRef = sRef.disassembleIf(nestedRef);
@@ -278,7 +252,7 @@ public abstract class StatementTest {
         /*
          * Setup
          */
-        final int ifElsePos = 2;
+        final int ifElsePos = 7;
         Statement blockTest = this.createFromFileTest(FILE_NAME_1);
         Statement blockRef = this.createFromFileRef(FILE_NAME_1);
         Statement emptyBlock = blockRef.newInstance();
@@ -311,7 +285,7 @@ public abstract class StatementTest {
         /*
          * Setup
          */
-        final int ifElsePos = 2;
+        final int ifElsePos = 7;
         Statement blockTest = this.createFromFileTest(FILE_NAME_1);
         Statement blockRef = this.createFromFileRef(FILE_NAME_1);
         Statement sTest = blockTest.removeFromBlock(ifElsePos);
@@ -344,11 +318,12 @@ public abstract class StatementTest {
         /*
          * Setup
          */
+        final int whilePos = 7;
         Statement blockTest = this.createFromFileTest(FILE_NAME_1);
         Statement blockRef = this.createFromFileRef(FILE_NAME_1);
         Statement emptyBlock = blockRef.newInstance();
-        Statement sourceTest = blockTest.removeFromBlock(1);
-        Statement sourceRef = blockRef.removeFromBlock(1);
+        Statement sourceTest = blockTest.removeFromBlock(whilePos);
+        Statement sourceRef = blockRef.removeFromBlock(whilePos);
         Statement nestedTest = sourceTest.newInstance();
         Statement nestedRef = sourceRef.newInstance();
         Condition cTest = sourceTest.disassembleIf(nestedTest);
@@ -377,7 +352,7 @@ public abstract class StatementTest {
         /*
          * Setup
          */
-        final int whilePos = 3;
+        final int whilePos = 9;
         Statement blockTest = this.createFromFileTest(FILE_NAME_1);
         Statement blockRef = this.createFromFileRef(FILE_NAME_1);
         Statement sTest = blockTest.removeFromBlock(whilePos);

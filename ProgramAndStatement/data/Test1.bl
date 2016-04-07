@@ -1,0 +1,20 @@
+    PROGRAM Killlll IS
+
+        INSTRUCTION Search IS
+            WHILE next-is-empty DO
+                move
+            END WHILE
+        END Search
+
+    BEGIN
+        WHILE true DO
+            Search
+            IF next-is-enemy THEN
+                infect
+            ELSE
+                IF next-is-wall THEN
+                    turnright
+                END IF
+            END IF
+        END WHILE
+    END Killlll
